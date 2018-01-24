@@ -23,11 +23,11 @@ $app->get(
 
 //Ready for testing
 $app->get('address-attributes-id/V0/{addressId}', 'AddressController@getAddressAttributesByApiId');
-$app->get('address-attributes-city-id/V0/{cityId}', 'AddressController@getAddressAttributesByCityId');
+$app->get('address-attributes-city-id/V0/{cityId}', 'AddressController@getAddressAttributesByCityAddressId');
+$app->get('address-attributes-county-id/V0/{countyId}', 'AddressController@getAddressAttributesByCountyAddressId');
+$app->get('address-attributes/V0/{address}', 'AddressController@getAddressAttributesByAddress');
 
 //To Do
-$app->get('address-attributes/V0/{address}', 'AddressController@addressAttributes');
-$app->get('address-attributes-county-id/V0/{countyId}', 'AddressController@addressAttributesByCountyId');
 $app->get('address-by-metro-area/V0/{metro_area}', 'AddressController@addressByMetroArea');
 $app->get('address-by-neighborhood/V0/{neighborhood}', 'AddressController@addressByNeighborhood');
 $app->get('address', 'AddressController@index');

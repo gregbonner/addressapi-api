@@ -25,20 +25,38 @@ class AddressController extends Controller
         return response()->json($addressAll);
     }
 
-    public function getAddressIdFromCityId($cityAddressId)
+    public function getAddressIdFromCityAddressId($cityAddressId)
     {
 
         $addressId = DB::table('address_keys')
         ->select('id')
         ->where('city_address_id', '=', $cityAddressId)
         ->get();
+    }
 
+    public function getAddressIdFromCountyAddressId($countyAddressId)
+    {
+
+        $addressId = DB::table('address_keys')
+        ->select('id')
+        ->where('county_address_id', '=', $countyAddressId)
+        ->get();
+    }
+
+    public function getAddressIdFromAddress($address)
+    {
+
+        $addressId = DB::table('address_keys')
+        ->select('id')
+        ->where('city_address_id', '=', $cityAddressId)
+        ->get();
     }
 
     /**
-     * Display a single address record
+     * Display a set of attributes about an AddressApi Id
      *
      * @return Response
+     *  http://dev-api.codeforkc.org//address-attributes-id/V0/25087?city=KANSAS%20CITY&state=MO
      */    
     public function getAddressAttributesByApiId($apiId)
     {
@@ -47,6 +65,71 @@ class AddressController extends Controller
         return $allAttributes;
 
     }
+
+    /**
+    * Display a set of attributes about a Kansas City, MO Id (KIVA PIN)
+    *
+    * @return Response
+    * http://dev-api.codeforkc.org//address-attributes-city-id/V0/124911?city=KANSAS%20CITY&state=MO
+    */
+    public function getAddressAttributesByCityAddressId($cityAddressId)
+    {
+     
+        //TODO:  Convert cityId to AddressId
+        $addressId = $this -> getAddressIdFromCityAddressId($cityAddressId);
+
+        $allAttributes = $this -> getAddressAttributes('address_keys.city_address_id', $cityAddressId);
+        $addressRecord = $this -> getAddressRecord($addressId);
+        return $allAttributes;
+    }
+
+    /**
+    * Display a set of attributes about a county address Id
+    *
+    * @return Response
+    * http://dev-api.codeforkc.org//address-attributes-county-id/V0/JA29520250800000000?city=KANSAS%20CITY&state=MO
+    */
+    public function getAddressAttributesByCountyAddressId($countyAddressId)
+    {
+     
+        //TODO:  Convert countyAddressId to AddressId
+        $addressId = $this -> getAddressIdFromCountyAddressId($countyAddressId);
+
+        $allAttributes = $this -> getAddressAttributes('address_keys.county_address_id', $countyAddressId);
+        $addressRecord = $this -> getAddressRecord($addressId);
+        return $allAttributes;
+    }
+
+   /**
+    * Display a set of attributes about an address
+    *
+    * @return Response
+    * http://dev-api.codeforkc.org//address-attributes/V0/210%20W%2019TH%20TER?city=Kansas%20City&state=mo
+    */
+    public function getAddressAttributesByAddress($address)
+    {
+     
+        $addressId = $this -> getAddressIdFromAddress($address);
+
+        $allAttributes = $this -> getAddressAttributes('address_keys.id', $addressId);
+        $addressRecord = $this -> getAddressRecord($addressId);
+        return $allAttributes;
+    }
+
+    /**
+    * Display a set of attributes about an address
+    *
+    * @return Response
+    * http://dev-api.codeforkc.org//address-by-neighborhood/V0/Kirkside?city=&state=mo
+    */
+    public function getAddressByNeighborhood($neighborhood)
+    {
+
+        $allAttributes = $this -> getAddressAttributes('address_keys.id', $addressId);
+        $addressRecord = $this -> getAddressRecord($addressId);
+        return $allAttributes;
+    }
+
 
     /**
      * Display a single address record
@@ -189,22 +272,6 @@ class AddressController extends Controller
         ->where($filterColumn, '=', $filterValue)
         ->get();
 
-    }
-      
-    /**
-    * Display a set of attributes about an address
-    *
-    * @return Response
-    */
-    public function getAddressAttributesByCityId($cityId)
-    {
-     
-        //TODO:  Convert cityId to AddressId
-        $addressId = $this -> getAddressIdFromCityId($cityId);
-
-        $allAttributes = $this -> getAddressAttributes('address_keys.city_address_id', $cityId);
-        $addressRecord = $this -> getAddressRecord($addressId);
-        return $allAttributes;
     }
 
 }
