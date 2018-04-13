@@ -11,36 +11,49 @@
 |
 */
 
-$app->get('/', function () use ($app) {
-    return $app->version();
-});
-
 $app->get(
-    'foo', function () {
-        return 'Hello World';
+    '/', function () use ($app) {
+        return $app->version();
     }
 );
 
 //Ready for testing
-$app->get('address-attributes-id/V0/{addressId}', 'AddressController@getAddressAttributesByApiId');
-$app->get('address-attributes-city-id/V0/{cityId}', 'AddressController@getAddressAttributesByCityAddressId');
-$app->get('address-attributes-county-id/V0/{countyId}', 'AddressController@getAddressAttributesByCountyAddressId');
-$app->get('address-attributes/V0/{address}', 'AddressController@getAddressAttributesByAddress');
+$app->get(
+    'address-attributes-id/V1/{addressId}',
+    'AddressController@getAddressAttributesByAddressApiId'
+);
+$app->get(
+    'address-attributes-city-id/V1/{cityId}',
+    'AddressController@getAddressAttributesByCityAddressId'
+);
+$app->get(
+    'address-attributes-county-id/V1/{countyId}',
+    'AddressController@getAddressAttributesByCountyAddressId'
+);
+$app->get(
+    'address-attributes/V1/{address}',
+    'AddressController@getAddressAttributesByAddress'
+);
+$app->get(
+    'address-by-metro-area/V1/{metroAreaName}',
+    'AddressController@getAddressByMetroArea'
+);
+$app->get(
+    'address-by-neighborhood/V1/{neighborhoodName}',
+    'AddressController@getAddressByNeighborhood'
+);
 
 //To Do
-$app->get('address-by-metro-area/V0/{metro_area}', 'AddressController@addressByMetroArea');
-$app->get('address-by-neighborhood/V0/{neighborhood}', 'AddressController@addressByNeighborhood');
 $app->get('address', 'AddressController@index');
-
-$app->get('police_divisions/V0', '');
+$app->get('address-typeahead/V0/{address}', '');
+$app->get('all/V0', '');
+$app->get('by-address/V0/{address}', '');
+$app->get('jd_wp/{:id}', '');
 $app->get('kcmo_tifs/V0', '');
-$app->get('neighborhood_census/V0', '');
 $app->get('metro-areas/V0', '');
+$app->get('neighborhood_census/V0', '');
 $app->get('neighborhoods-geo/V0/{id}', '');
 $app->get('neighborhoods/V0/{id}', '');
-$app->get('address-typeahead/V0/{address}', '');
-$app->get('by-address/V0/{address}', '');
 $app->get('neighborhood-typeahead/V0/{neighborhood}', '');
 $app->get('neighborhood-attributes/V0/{neighborhood}', '');
-$app->get('all/V0', '');
-$app->get('jd_wp/{:id}', '');
+$app->get('police_divisions/V0', '');

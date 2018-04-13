@@ -1,5 +1,15 @@
 <?php
-
+/**
+ * PHP Version 5.5.9
+ * 
+ * Comment here
+ * 
+ * @category Test
+ * @package  Test
+ * @author   Display Name <username@example.com>
+ * @license  MIT License
+ * @link     http://test.com/test
+ */
 namespace App\Http\Controllers;
 
 use App\Address;
@@ -11,6 +21,15 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Laravel\Lumen\Routing\Controller as BaseController;
 
+    /**
+     * Display a set of attributes about an address
+     * 
+     * @category Test
+     * @package  Test
+     * @author   Display Name <username@example.com>
+     * @license  MIT License
+     * @link     Test
+     */
 class AddressController extends Controller
 {
 
@@ -25,7 +44,34 @@ class AddressController extends Controller
         return response()->json($addressAll);
     }
 
-    public function getAddressIdFromCityAddressId($cityAddressId)
+    /**
+     * Verify that City and State are valid.
+     * This is stub code till we figure out a better way.
+     * 
+     * @param string $city  city
+     * @param string $state state
+     * 
+     * @return bool
+     */
+    private function _cityStateValid($city, $state)
+    {
+        if (($city == "" || $city == "KANSAS CITY")
+            && ($state == "" || $state == "MO")
+        ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * Description here
+     *
+     * @param int $cityAddressId comment here
+     * 
+     * @return Response
+     */
+    private function _getAddressApiIdFromCityAddressId($cityAddressId)
     {
 
         $addressId = DB::table('address_keys')
@@ -34,7 +80,14 @@ class AddressController extends Controller
         ->get();
     }
 
-    public function getAddressIdFromCountyAddressId($countyAddressId)
+    /**
+     * Description here
+     * 
+     * @param int $countyAddressId description here
+     *
+     * @return Response
+     */    
+    private function _getAddressApiIdFromCountyAddressId($countyAddressId)
     {
 
         $addressId = DB::table('address_keys')
@@ -43,10 +96,17 @@ class AddressController extends Controller
         ->get();
     }
 
-    public function getAddressIdFromAddress($address)
+    /**
+     * Description here
+     * 
+     * @param string $address comment here
+     *
+     * @return Response
+     */
+    private function _getAddressApiIdFromAddress($address)
     {
 
-        $addressId = DB::table('address_keys')
+        $addressApiId = DB::table('address_keys')
         ->select('id')
         ->where('city_address_id', '=', $cityAddressId)
         ->get();
@@ -55,88 +115,142 @@ class AddressController extends Controller
     /**
      * Display a set of attributes about an AddressApi Id
      *
+     * @param int $apiId The identifier
+     * 
      * @return Response
      *  http://dev-api.codeforkc.org//address-attributes-id/V0/25087?city=KANSAS%20CITY&state=MO
      */    
-    public function getAddressAttributesByApiId($apiId)
+    public function getAddressAttributesByAddressApiId($addressApiId)
     {
-        $allAttributes = $this -> getAddressAttributes('address_keys.address_id', $apiId);
-        $addressRecord = $this -> getAddressRecord($apiId);
+        $in_city = strtoupper($app->request()->params('city'));
+        $in_state = strtoupper($app->request()->params('state'));
+        
+        $allAttributes = $this -> _getAddressAttributes(
+            'address_keys.address_id',
+            $addressApiId
+        );
+        $addressRecord = $this -> _getAddressRecord($addressApiId);
         return $allAttributes;
 
     }
 
     /**
-    * Display a set of attributes about a Kansas City, MO Id (KIVA PIN)
-    *
-    * @return Response
-    * http://dev-api.codeforkc.org//address-attributes-city-id/V0/124911?city=KANSAS%20CITY&state=MO
-    */
-    public function getAddressAttributesByCityAddressId($cityAddressId)
+     * Display a set of attributes about a Kansas City, MO Id (KIVA PIN)
+     *
+     * @param string  $cityAddressId comment here
+     * @param Request $request       request
+     *   
+     * @return Response
+     * http://dev-api.codeforkc.org//address-attributes-city-id/V0/124911?city=KANSAS%20CITY&state=MO
+     */
+    public function getAddressAttributesByCityAddressId(string $cityAddressId, Request $request = null)
     {
      
-        //TODO:  Convert cityId to AddressId
-        $addressId = $this -> getAddressIdFromCityAddressId($cityAddressId);
+        //grab city and state
+        $inCity = strtoupper($request->request()->params('city'));
+        $inState = strtoupper($request->request()->params('state'));
 
-        $allAttributes = $this -> getAddressAttributes('address_keys.city_address_id', $cityAddressId);
-        $addressRecord = $this -> getAddressRecord($addressId);
+        if (_cityStateValid($in_city, $in_state)) {
+
+        }
+
+        //Convert cityId to AddressApiId
+        $addressApiId = $this -> getAddressApiIdFromCityAddressId($cityAddressId);
+
+        $allAttributes = $this -> _getAddressAttributes(
+            'address_keys.city_address_id',
+            $cityAddressId
+        );
+        $addressRecord = $this -> _getAddressRecord($addressApiId);
         return $allAttributes;
     }
 
     /**
-    * Display a set of attributes about a county address Id
-    *
-    * @return Response
-    * http://dev-api.codeforkc.org//address-attributes-county-id/V0/JA29520250800000000?city=KANSAS%20CITY&state=MO
-    */
+     * Display a set of attributes about a county address Id
+     *
+     * @param int $countyAddressId comment here
+     * 
+     * @return Response
+     * http://dev-api.codeforkc.org//address-attributes-county-id/V0/JA29520250800000000?city=KANSAS%20CITY&state=MO
+     */
     public function getAddressAttributesByCountyAddressId($countyAddressId)
     {
      
-        //TODO:  Convert countyAddressId to AddressId
-        $addressId = $this -> getAddressIdFromCountyAddressId($countyAddressId);
+        //Convert countyAddressId to AddressApiId
+        $addressId = $this -> getAddressApiIdFromCountyAddressId($countyAddressId);
 
-        $allAttributes = $this -> getAddressAttributes('address_keys.county_address_id', $countyAddressId);
-        $addressRecord = $this -> getAddressRecord($addressId);
+        $allAttributes = $this -> _getAddressAttributes(
+            'address_keys.county_address_id',
+            $countyAddressId
+        );
+        $addressRecord = $this -> _getAddressRecord($addressId);
         return $allAttributes;
     }
 
-   /**
-    * Display a set of attributes about an address
-    *
-    * @return Response
-    * http://dev-api.codeforkc.org//address-attributes/V0/210%20W%2019TH%20TER?city=Kansas%20City&state=mo
-    */
+    /**
+     * Display a set of attributes about an address
+     *
+     * @param int $address comment here
+     * 
+     * @return Response
+     * http://dev-api.codeforkc.org//address-attributes/V0/210%20W%2019TH%20TER?city=Kansas%20City&state=mo
+     */
     public function getAddressAttributesByAddress($address)
     {
      
-        $addressId = $this -> getAddressIdFromAddress($address);
+        $addressApiId = $this -> getAddressApiIdFromAddress($address);
 
-        $allAttributes = $this -> getAddressAttributes('address_keys.id', $addressId);
-        $addressRecord = $this -> getAddressRecord($addressId);
+        $allAttributes = $this -> _getAddressAttributes(
+            'address_keys.id',
+            $addressApiId
+        );
+        $addressRecord = $this -> _getAddressRecord($addressApiId);
         return $allAttributes;
     }
 
-    /**
-    * Display a set of attributes about an address
-    *
-    * @return Response
-    * http://dev-api.codeforkc.org//address-by-neighborhood/V0/Kirkside?city=&state=mo
-    */
-    public function getAddressByNeighborhood($neighborhood)
+     /**
+      * Display a set of attributes about a Kansas City, MO Id (KIVA PIN)
+      *
+      * @param int $metroArea comment here
+      *
+      * @return Response
+      * http://dev-api.codeforkc.org//address-attributes-city-id/V0/124911?city=KANSAS%20CITY&state=MO
+      */
+    public function getAddressByMetroArea($metroArea)
     {
+     
+        $allAttributes = $this -> _getAddressAttributes(
+            'census_attributes.metro_areas',
+            urlencode($metroArea)
+        );
+        return urlencode($metroArea);
+    }    
 
-        $allAttributes = $this -> getAddressAttributes('address_keys.id', $addressId);
-        $addressRecord = $this -> getAddressRecord($addressId);
+     /**
+      * Display a set of attributes about an address
+      *
+      * @param int $neighborhoodName comment here
+      *
+      * @return Response
+      * http://dev-api.codeforkc.org//address-by-neighborhood/V0/Kirkside?city=&state=mo
+      */
+    public function getAddressByNeighborhood($neighborhoodName)
+    {    
+        $allAttributes = $this -> _getAddressAttributes(
+            'city_address_attributes.neighborhood',
+            urlencode($neighborhoodName)
+        );
         return $allAttributes;
     }
-
 
     /**
      * Display a single address record
-     *
+     * 
+     * @param int $addressId comment here
+     * 
      * @return Response
      */
-    public function getAddressRecord($addressId)
+    private function _getAddressRecord($addressId)
     {
         $address = DB::table('address')
         ->where('id', '=', $addressId)
@@ -145,6 +259,8 @@ class AddressController extends Controller
 
     /**
      * Display a set of attributes about an address
+     * 
+     * @param int $countyId comment here
      *
      * @return Response
      */
@@ -156,11 +272,41 @@ class AddressController extends Controller
     }
 
     /**
+     * Description here
+     * 
+     * @param string $neighborhoodName comment here
+     *
+     * @return Response
+     */
+    private function _getNeighborhood($neighborhoodName)
+    {
+    
+        if (!$this->neighbornood_query) {
+            $sql = $this->base_sql . ' WHERE UPPER(city_address_attributes.neighborhood) = :nighborhood';
+            $this->neighbornood_query = $this->dbh->prepare("$sql  -- " . __FILE__ . ' ' . __LINE__);
+        }
+
+        try {
+            $this->neighbornood_query->execute(array(':nighborhood' => strtoupper($neighborhoodName)));
+        } catch (PDOException  $e) {
+            error_log($e->getMessage() . ' ' . __FILE__ . ' ' . __LINE__);
+            //throw new Exception('Unable to query database');
+            return false;
+        }
+
+        return $this->neighbornood_query->fetchAll(PDO::FETCH_ASSOC);
+
+    }
+
+    /**
      * Display a set of attributes about an address
+     * 
+     * @param string $filterColumn comment here
+     * @param string $filterValue  comment here
      *
      * @return Response
      */     
-    public function getAddressAttributes($filterColumn, $filterValue)
+    private function _getAddressAttributes($filterColumn, $filterValue)
     {
 
         return DB::table('city_address_attributes')
